@@ -1,0 +1,59 @@
+{
+    "manifest_version": 3,
+    "name": "NotThatOne",
+    "version": "1.0.5",
+    "description": "Remembers which account you used on different websites so you never log in with the wrong one again.",
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+    },
+    "permissions": [
+        "storage",
+        "tabs"
+    ],
+    "host_permissions": [
+        "https://*.google.com/*"
+    ],
+    "background": {
+        "service_worker": "service-worker.js",
+        "type": "module"
+    },
+    "content_scripts": [
+        {
+        "matches": [
+            "https://accounts.google.com/*"
+        ],
+        "js": [
+            "modules/providers.js",
+            "scripts/capture-engine.js"
+        ],
+        "run_at": "document_idle"
+        },
+        {
+        "matches": [
+            "http://*/*",
+            "https://*/*"
+        ],
+        "js": [
+            "modules/themes.js",
+            "modules/providers.js",
+            "modules/ui-templates.js",
+            "modules/recovery-picker.js",
+            "scripts/injection-engine.js"
+        ],
+        "run_at": "document_idle"
+        }
+    ],
+    "action": {
+        "default_popup": "popup/dashboard.html",
+        "default_icon": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+        }
+    },
+    "sandbox": {
+        "pages": []
+    }
+}

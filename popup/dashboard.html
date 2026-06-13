@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NotThatOne</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 340px;
+      min-height: 180px;
+      max-height: 520px;
+      background: var(--bg-main, #ffffff);
+      color: var(--text-main, #222222);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 13px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--border-color, #e5e7eb);
+      position: sticky;
+      top: 0;
+      background: var(--bg-main, #ffffff);
+      z-index: 10;
+    }
+    .header-icon { font-size: 20px; line-height: 1; }
+    .header-title { font-size: 14px; font-weight: 700; color: var(--text-main, #111111); }
+    .header-sub   { font-size: 11px; color: var(--text-muted, #6b7280); margin-top: 1px; }
+
+    .state {
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--text-muted, #9ca3af);
+    }
+    .state-icon { font-size: 26px; margin-bottom: 10px; }
+    .state p    { font-size: 12px; line-height: 1.6; }
+
+    .group { border-bottom: 1px solid var(--border-color, #e5e7eb); }
+    .group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px 5px;
+    }
+    .group-name {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted, #4b5563);
+    }
+    .btn-del-domain {
+      all: unset;
+      cursor: pointer;
+      font-size: 10.5px;
+      color: var(--text-muted, #4b5563);
+      padding: 2px 7px;
+      border-radius: 4px;
+      transition: color 0.12s, background 0.12s;
+    }
+    .btn-del-domain:hover { color: #e05555; background: var(--bg-accent, #f3f4f6); }
+
+    .account {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 16px 7px 22px;
+      transition: background 0.1s;
+    }
+    .account:hover { background: var(--bg-accent, #f9fafb); }
+    .account-email {
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 12.5px;
+      color: var(--text-main, #374151);
+    }
+    .account-time {
+      font-size: 10px;
+      color: var(--text-muted, #9ca3af);
+      flex-shrink: 0;
+    }
+    .btn-del-account {
+      all: unset;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-muted, #9ca3af);
+      padding: 2px 5px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      transition: color 0.12s;
+    }
+    .btn-del-account:hover { color: #e05555; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid var(--bg-accent, #e5e7eb);
+      border-top-color: var(--brand-primary, #4f46e5);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin: 40px auto;
+    }
+
+    .account.removing, .group.removing {
+      transition: opacity 0.2s, max-height 0.25s;
+      overflow: hidden;
+      opacity: 0;
+      max-height: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <span class="header-icon">👤</span>
+    <div>
+      <div class="header-title">NotThatOne</div>
+      <div class="header-sub">Saved account mappings</div>
+    </div>
+  </div>
+  <div id="content"><div class="spinner"></div></div>
+  <script src="../modules/themes.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>
