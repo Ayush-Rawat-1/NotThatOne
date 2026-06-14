@@ -1,7 +1,7 @@
 /**
  * NotThatOne - Injection Engine
- * Runs on auth pages (login, signin, signup, register, etc.).
- * Shows a reminder badge or a recovery picker fallback.
+ * Evaluates authorization status to inject badges or candidate recovery interfaces.
+ * Prioritizes active background snapshots over static reminder labels.
  */
 
 (function () {
@@ -11,45 +11,33 @@
         return;
     }
 
-    // ─── Domain Extraction ──────────────────────────────────────────────────
-
     function getCurrentDomain() {
         return window.NTO.cleanIdentifier(window.location.hostname);
     }
 
-    // ─── Badge Management ───────────────────────────────────────────────────
-
     let queriedDomain = null;
 
     /**
-     * Main logic: checks storage and injects badge if accounts exist.
+     * Decentralized evaluation loop routing badge vs picker layouts independently.
      */
     async function tryShowBadge() {
-        const currentUrl = window.location.href.toLowerCase();
-        
-        // Target list of keywords commonly found in authenticating URLs
-        const authKeywords = ['login', 'signin', 'signup', 'register', 'auth'];
-        
-        // Verify if at least one target authentication keyword matches the current URL path
-        const isAuthPage = authKeywords.some(keyword => currentUrl.includes(keyword));
-
-        if (!isAuthPage) {
-            // Quietly clean up the badge UI if the user browses away to a regular page
-            document.getElementById('nto-badge-container')?.remove();
-            return;
-        }
+        if (window.location.hostname.includes('google.com')) return;
 
         const domain = getCurrentDomain();
         if (!domain) return;
 
-        const existingBadge = document.getElementById('nto-badge-container');
+        const currentUrl = window.location.href.toLowerCase();
+        const authKeywords = ['login', 'signin', 'signup', 'register', 'auth', 'connect', 'account'];
+        const isAuthPage = authKeywords.some(keyword => currentUrl.includes(keyword));
 
-        // Only skip if domain hasn't changed AND the badge is actively on screen
-        if (domain === queriedDomain && existingBadge) return;
+        const existingElement = document.getElementById('nto-badge-container') || document.getElementById('nto-recovery-container');
+
+        if (domain === queriedDomain && existingElement) return;
         queriedDomain = domain;
 
-        // Clean up any old shell instance
-        existingBadge?.remove();
+        // Clean up ANY old extension elements from the screen before drawing new ones
+        document.getElementById('nto-badge-container')?.remove();
+        document.getElementById('nto-recovery-container')?.remove();
 
         let response;
         try {
@@ -61,33 +49,34 @@
             return;
         }
 
-        // --- RECOVERY PICKER FALLBACK CHECK ---
-        if (!response?.success || !response.data?.length) {
-            if (sessionStorage.getItem('nto_auth_attempt_active') === 'true') {
-                sessionStorage.removeItem('nto_auth_attempt_active');
+        if (!response?.success) return;
 
-                const recoveryWin = window.NTO.RecoveryPicker.buildWindow(domain, (typedEmail) => {
+        // Route A: Display the Recovery Picker anywhere across the domain if a snapshot is waiting
+        if (response.type === "RECOVERY_PICKER") {
+            const recoveryWin = window.NTO.RecoveryPicker.buildWindow(
+                domain, 
+                response.candidates, 
+                (chosenEmail) => {
+                    // Success callback
                     chrome.runtime.sendMessage({
                         action: "SAVE_ACCOUNT",
-                        payload: { domain, email: typedEmail }
+                        payload: { domain, email: chosenEmail }
                     });
-                });
-                
-                if (document.body) {
-                    document.body.appendChild(recoveryWin);
+                },
+                () => {
+                    // Explicit close dismissal callback
+                    chrome.runtime.sendMessage({
+                        action: "CLEAR_PENDING_LOGIN",
+                        payload: { domain }
+                    });
                 }
-            }
-            return;
-        }
-
-        // Consume/clear out any hanging authorization attempt markers
-        sessionStorage.removeItem('nto_auth_attempt_active');
-
-        // --- REGULAR REMINDER BADGE INJECTION ---
-        const badge = UITemplates.buildReminderBadge(response.data);
-
-        if (document.body) {
-            document.body.appendChild(badge);
+            );
+            if (document.body) document.body.appendChild(recoveryWin);
+        } 
+        // Route B: If no active login flow is tracking, show the reminder badge on explicit auth pages
+        else if (response.type === "REGULAR_BADGE" && isAuthPage) {
+            const badge = UITemplates.buildReminderBadge(response.data);
+            if (document.body) document.body.appendChild(badge);
         }
     }
 
