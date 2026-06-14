@@ -1,6 +1,6 @@
 /**
  * NotThatOne - Theme Configurations
- * Centralized color management.
+ * Centralized color management with storage integration.
  */
 
 window.NTO = window.NTO || {};
@@ -28,9 +28,20 @@ window.NTO.Themes = {
     }
 };
 
-window.NTO.applyTheme = function(element, themeName = 'light') {
-    const selectedTheme = window.NTO.Themes[themeName] || window.NTO.Themes.light;
+window.NTO.applyTheme = function(element, themeName = 'dark') {
+    const selectedTheme = window.NTO.Themes[themeName] || window.NTO.Themes.dark;
     Object.entries(selectedTheme).forEach(([cssVar, cssValue]) => {
         element.style.setProperty(cssVar, cssValue);
+    });
+};
+
+/**
+ * Reads user preference from local extension configuration storage automatically.
+ */
+window.NTO.applyUserTheme = function(element, callback) {
+    chrome.storage.local.get(['user_theme_preference'], (result) => {
+        const preferredTheme = result.user_theme_preference || 'dark'; // baseline fallback to dark
+        window.NTO.applyTheme(element, preferredTheme);
+        if (typeof callback === 'function') callback(preferredTheme);
     });
 };

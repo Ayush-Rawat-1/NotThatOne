@@ -166,7 +166,7 @@ window.NTO.UITemplates = {
 
         const container = document.createElement('div');
         container.id = 'nto-badge-container';
-        window.NTO.applyTheme(container, 'dark');
+        window.NTO.applyUserTheme(container);
 
         let subTextHtml = '';
         if (othersCount > 0) {
@@ -197,7 +197,7 @@ window.NTO.UITemplates = {
 
         container.innerHTML = `
             <div id="nto-badge-main-row">
-                <div id="nto-icon">👤</div>
+                <div id="nto-icon">🔑</div>
                 <div id="nto-text">
                     <div id="nto-label">Last used here</div>
                     <div id="nto-email" title="${primary}">${primary}</div>

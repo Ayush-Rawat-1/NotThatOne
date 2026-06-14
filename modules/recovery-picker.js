@@ -159,7 +159,7 @@ window.NTO.RecoveryPicker = {
 
         const container = document.createElement('div');
         container.id = 'nto-recovery-container';
-        window.NTO.applyTheme(container, 'dark');
+        window.NTO.applyUserTheme(container);
 
         let chipsHtml = '';
         if (candidates && candidates.length > 0) {

@@ -1,9 +1,10 @@
 /**
  * NotThatOne - Dashboard
- * Renders saved mappings with optimistic UI and applies the theme configuration.
+ * Renders saved mappings with optimistic UI and manages real-time theme toggling.
  */
 
 const content = document.getElementById('content');
+const themeToggleBtn = document.getElementById('nto-theme-toggle-btn');
 
 function timeAgo(ts) {
     const d = Date.now() - ts; 
@@ -149,6 +150,21 @@ async function loadDashboard() {
     }
 }
 
-//  Apply the modern light theme automatically on launch
-window.NTO.applyTheme(document.body, 'light');
-loadDashboard(); 
+// Initialize theme dynamically based on user configuration mapping entries
+let currentTheme = 'dark';
+window.NTO.applyUserTheme(document.body, (activeTheme) => {
+    currentTheme = activeTheme;
+    themeToggleBtn.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+});
+
+// Setup click runner routine to flip active style palettes
+themeToggleBtn.addEventListener('click', () => {
+    const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    chrome.storage.local.set({ user_theme_preference: nextTheme }, () => {
+        currentTheme = nextTheme;
+        window.NTO.applyTheme(document.body, currentTheme);
+        themeToggleBtn.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+    });
+});
+
+loadDashboard();

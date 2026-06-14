@@ -10,8 +10,8 @@
       width: 340px;
       min-height: 180px;
       max-height: 520px;
-      background: var(--bg-main, #ffffff);
-      color: var(--text-main, #222222);
+      background: var(--bg-main, #1c1c1c);
+      color: var(--text-main, #efefef);
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-size: 13px;
       overflow-y: auto;
@@ -21,27 +21,44 @@
     .header {
       display: flex;
       align-items: center;
-      gap: 9px;
+      justify-content: space-between; /* Space out title and icon toggle */
       padding: 13px 16px;
-      border-bottom: 1px solid var(--border-color, #e5e7eb);
+      border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.06));
       position: sticky;
       top: 0;
-      background: var(--bg-main, #ffffff);
+      background: var(--bg-main, #1c1c1c);
       z-index: 10;
     }
+    .header-left { display: flex; align-items: center; gap: 9px; }
     .header-icon { font-size: 20px; line-height: 1; }
-    .header-title { font-size: 14px; font-weight: 700; color: var(--text-main, #111111); }
-    .header-sub   { font-size: 11px; color: var(--text-muted, #6b7280); margin-top: 1px; }
+    .header-title { font-size: 14px; font-weight: 700; color: var(--text-main, #efefef); }
+    .header-sub   { font-size: 11px; color: var(--text-muted, #888888); margin-top: 1px; }
+
+    /* Theme Toggle Button Layout */
+    #nto-theme-toggle-btn {
+      all: unset;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 6px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.12s;
+    }
+    #nto-theme-toggle-btn:hover {
+      background: var(--bg-accent, #2a2a2a);
+    }
 
     .state {
       padding: 40px 20px;
       text-align: center;
-      color: var(--text-muted, #9ca3af);
+      color: var(--text-muted, #888888);
     }
     .state-icon { font-size: 26px; margin-bottom: 10px; }
     .state p    { font-size: 12px; line-height: 1.6; }
 
-    .group { border-bottom: 1px solid var(--border-color, #e5e7eb); }
+    .group { border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.06)); }
     .group-header {
       display: flex;
       align-items: center;
@@ -53,18 +70,18 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.07em;
-      color: var(--text-muted, #4b5563);
+      color: var(--text-muted, #888888);
     }
     .btn-del-domain {
       all: unset;
       cursor: pointer;
       font-size: 10.5px;
-      color: var(--text-muted, #4b5563);
+      color: var(--text-muted, #888888);
       padding: 2px 7px;
       border-radius: 4px;
       transition: color 0.12s, background 0.12s;
     }
-    .btn-del-domain:hover { color: #e05555; background: var(--bg-accent, #f3f4f6); }
+    .btn-del-domain:hover { color: #e05555; background: var(--bg-accent, #2a2a2a); }
 
     .account {
       display: flex;
@@ -73,7 +90,7 @@
       padding: 7px 16px 7px 22px;
       transition: background 0.1s;
     }
-    .account:hover { background: var(--bg-accent, #f9fafb); }
+    .account:hover { background: var(--bg-accent, #2a2a2a); }
     .account-email {
       flex: 1;
       min-width: 0;
@@ -81,18 +98,18 @@
       overflow: hidden;
       text-overflow: ellipsis;
       font-size: 12.5px;
-      color: var(--text-main, #374151);
+      color: var(--text-main, #efefef);
     }
     .account-time {
       font-size: 10px;
-      color: var(--text-muted, #9ca3af);
+      color: var(--text-muted, #888888);
       flex-shrink: 0;
     }
     .btn-del-account {
       all: unset;
       cursor: pointer;
       font-size: 13px;
-      color: var(--text-muted, #9ca3af);
+      color: var(--text-muted, #888888);
       padding: 2px 5px;
       border-radius: 4px;
       flex-shrink: 0;
@@ -103,8 +120,8 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .spinner {
       width: 16px; height: 16px;
-      border: 2px solid var(--bg-accent, #e5e7eb);
-      border-top-color: var(--brand-primary, #4f46e5);
+      border: 2px solid var(--bg-accent, #2a2a2a);
+      border-top-color: var(--brand-primary, #6366f1);
       border-radius: 50%;
       animation: spin 0.6s linear infinite;
       margin: 40px auto;
@@ -121,11 +138,14 @@
 </head>
 <body>
   <div class="header">
-    <span class="header-icon">👤</span>
-    <div>
-      <div class="header-title">NotThatOne</div>
-      <div class="header-sub">Saved account mappings</div>
+    <div class="header-left">
+      <span class="header-icon">🔑</span>
+      <div>
+        <div class="header-title">NotThatOne</div>
+        <div class="header-sub">Saved account mappings</div>
+      </div>
     </div>
+    <button id="nto-theme-toggle-btn" title="Toggle Theme">🌙</button>
   </div>
   <div id="content"><div class="spinner"></div></div>
   <script src="../modules/themes.js"></script>
