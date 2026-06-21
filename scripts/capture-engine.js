@@ -14,6 +14,10 @@
     let siteKey = null;
     let observer = null;
     let badgeShown = false;
+    
+    // CRITICAL: Flag to prevent the MutationObserver from rendering a stale 
+    // "Last used here" badge mid-click during a brand new login.
+    let isFirstTimeSaving = false;
 
     function resolveSiteKey() {
         if (siteKey) return siteKey;
@@ -25,7 +29,9 @@
      * Fetches stored accounts for the target site and displays the reminder badge.
      */
     async function showReminderBadgeOnGoogle() {
-        if (badgeShown) return;
+        // If the badge is already drawn OR we are actively handling a first-time save interaction, skip.
+        if (badgeShown || isFirstTimeSaving) return;
+        
         const key = resolveSiteKey();
         if (!key) return;
 
@@ -53,7 +59,7 @@
         const key = resolveSiteKey();
         if (!key) return;
 
-        // Try showing the badge as soon as we successfully determine the destination site key
+        // Try showing the historical badge if it exists in DB
         showReminderBadgeOnGoogle();
 
         let elements = [];
@@ -77,10 +83,30 @@
                 scrapedEmails.push(cleanMail);
             }
 
-            // Bind individual click listener if we haven't already
+            // Bind individual click listener
             if (!bound.has(el)) {
                 bound.add(el);
                 el.addEventListener('click', () => {
+                    const existingBadgeText = document.querySelector('.nto-badge-text');
+
+                    if (existingBadgeText) {
+                        // SUBSEQUENT LOGIN: The badge was already on-screen saying "Last used here".
+                        // Clicking it shouldn't say "Saved for next time", it should stay as is or confirm security.
+                        existingBadgeText.textContent = "Last used here";
+                    } else {
+                        // FIRST TIME LOGIN: No badge was on screen because DB was empty. 
+                        // Set the guard flag so mutation lookups don't overwrite this with "Last used here".
+                        isFirstTimeSaving = true;
+                        badgeShown = true; // Mark as shown so showReminderBadgeOnGoogle blocks completely
+
+                        const feedbackBadge = window.NTO.UITemplates.buildReminderBadge(
+                            [{ email: cleanMail }], 
+                            { overrideLabel: "Saved for next time!" }
+                        );
+                        if (document.body) document.body.appendChild(feedbackBadge);
+                    }
+
+                    // Dispatch data payload to background storage
                     chrome.runtime.sendMessage({
                         action: "SAVE_ACCOUNT",
                         payload: { domain: key, email: cleanMail }

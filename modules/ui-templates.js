@@ -60,7 +60,7 @@ const STYLES = `
   #nto-text { flex: 1; min-width: 0; }
   #nto-label {
     font-size: 10px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -153,8 +153,9 @@ function calculateTimeAgo(ts) {
 }
 
 window.NTO.UITemplates = {
-    buildReminderBadge(accounts, { autoDismissMs = 8000 } = {}) { // Initial baseline lifespan set to 8 seconds
-        const primary     = accounts[0].email;
+    // 1. Added optional configuration overrides ('overrideLabel') to options block
+    buildReminderBadge(accounts, { autoDismissMs = 8000, overrideLabel = null } = {}) { 
+        const primary     = accounts[0]?.email || '';
         const othersCount = accounts.length - 1;
 
         if (!document.getElementById('nto-styles')) {
@@ -167,6 +168,14 @@ window.NTO.UITemplates = {
         const container = document.createElement('div');
         container.id = 'nto-badge-container';
         window.NTO.applyUserTheme(container);
+
+        // 2. Compute the dynamic label text based on overrides or account flags
+        let labelText = overrideLabel;
+        if (!labelText) {
+            labelText = accounts[0]?.status === 'new_association' 
+                ? 'Saved for next time!' 
+                : 'Last used here';
+        }
 
         let subTextHtml = '';
         if (othersCount > 0) {
@@ -195,11 +204,12 @@ window.NTO.UITemplates = {
             integratedRowsHtml += `</div>`;
         }
 
+        // 3. Inject the dynamic 'labelText' variable into the element template string
         container.innerHTML = `
             <div id="nto-badge-main-row">
                 <div id="nto-icon">🔑</div>
                 <div id="nto-text">
-                    <div id="nto-label">Last used here</div>
+                    <div id="nto-label" class="nto-badge-text">${labelText}</div>
                     <div id="nto-email" title="${primary}">${primary}</div>
                     ${subTextHtml}
                 </div>
