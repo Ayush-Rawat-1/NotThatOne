@@ -43,11 +43,11 @@ async function handleAction(action, payload, sendResponse) {
             }
 
             case "GET_ACCOUNTS": {
-                const { domain } = payload || {};
+                const { domain, ignorePending } = payload || {};
                 if (!domain) return sendResponse({ success: false, error: "Missing: domain" });
 
                 // 1. Check if an active snapshot is waiting in memory
-                if (pendingLogins[domain]) {
+                if (!ignorePending && pendingLogins[domain]) {
                     // Check if the session has expired (5 minutes)
                     if (Date.now() - pendingLogins[domain].timestamp > 300000) {
                         delete pendingLogins[domain];
