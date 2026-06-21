@@ -1,0 +1,15 @@
+Privacy Policy for NotThatOne
+
+NotThatOne values your privacy. This extension is designed to function entirely client-side on your local device. 
+
+1. Data We Collect:
+- Personally Identifiable Information: The extension captures and stores the user's Google account email address selected during login processes.
+- User Activity: The extension interacts with specific page click elements on accounts.google.com to register which email profile was selected.
+
+2. How We Use and Store Data:
+All captured data is saved strictly using the local web browser storage API (chrome.storage.local). This configuration data stays entirely within your local machine's sandbox environment. 
+
+3. Third-Party Sharing:
+We do not host remote servers. We have zero access to your information. Your data is never sold, transmitted, or shared with any third party, analytics providers, or external cloud systems.
+
+For questions, please open an issue on the project's official repository.
