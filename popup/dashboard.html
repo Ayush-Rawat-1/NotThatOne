@@ -6,59 +6,138 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
+    /* Define Chrome-like color variables for both modes */
+    :root {
+      /* Default Dark Theme (Matches modern Chromium dark mode surfaces) */
+      --bg-main: #202124;
+      --bg-accent: #292a2d;
+      --text-main: #e8eaed;
+      --text-muted: #9aa0a6;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --brand-primary: #8ab4f8;
+
+      /* Custom Scrollbar Variable Config (Light Grey for Dark Theme) */
+      --scrollbar-thumb: #5f6368;
+      --scrollbar-thumb-hover: #80868b;
+    }
+
+    /* When your modular script updates the body class to light */
+    body.light-theme {
+      --bg-main: #ffffff;
+      --bg-accent: #f1f3f4;
+      --text-main: #202124;
+      --text-muted: #5f6368;
+      --border-color: rgba(0, 0, 0, 0.08);
+      --brand-primary: #1a73e8;
+
+      /* Custom Scrollbar Variable Config (Dark Grey for Light Theme) */
+      --scrollbar-thumb: #c1c1c1;
+      --scrollbar-thumb-hover: #787878;
+    }
+
+    /* 
+      Dynamic Expansion Mechanics:
+      Constrained tightly to your exact target boundary max threshold profile.
+    */
+    html, body {
       width: 340px;
       min-height: 180px;
-      max-height: 520px;
-      background: var(--bg-main, #1c1c1c);
-      color: var(--text-main, #efefef);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      max-height: 400px; /* Changed from 500px to 400px */
+      background: var(--bg-main);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       font-size: 13px;
-      overflow-y: auto;
-      overflow-x: hidden;
+      overflow: hidden; /* Keeps the main frame fixed */
+    }
+
+    /* Flex wrapper that bounds itself perfectly to the body's dynamic scale */
+    .popup-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 180px;
+      max-height: 400px; /* Changed from 500px to 400px */
     }
 
     .header {
       display: flex;
       align-items: center;
-      justify-content: space-between; /* Space out title and icon toggle */
-      padding: 13px 16px;
-      border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.06));
-      position: sticky;
-      top: 0;
-      background: var(--bg-main, #1c1c1c);
+      justify-content: space-between;
+      padding: 13px 16px 10px;
+      background: var(--bg-main);
       z-index: 10;
     }
     .header-left { display: flex; align-items: center; gap: 9px; }
     .header-icon { font-size: 20px; line-height: 1; }
-    .header-title { font-size: 14px; font-weight: 700; color: var(--text-main, #efefef); }
-    .header-sub   { font-size: 11px; color: var(--text-muted, #888888); margin-top: 1px; }
+    .header-title { font-size: 14px; font-weight: 700; color: var(--text-main); }
+    .header-sub   { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
 
-    /* Theme Toggle Button Layout */
     #nto-theme-toggle-btn {
       all: unset;
       cursor: pointer;
       font-size: 16px;
       padding: 6px;
-      border-radius: 5px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: background 0.12s;
     }
     #nto-theme-toggle-btn:hover {
-      background: var(--bg-accent, #2a2a2a);
+      background: var(--bg-accent);
+    }
+
+    /* Search Container using theme colors */
+    .search-container {
+      padding: 0 16px 12px 16px;
+      background: var(--bg-main);
+      border-bottom: 1px solid var(--border-color);
+    }
+    #nto-search-bar {
+      width: 100%;
+      padding: 7px 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background: var(--bg-accent);
+      color: var(--text-main);
+      font-size: 12px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    #nto-search-bar:focus {
+      border-color: var(--brand-primary);
+    }
+
+    /* Content area scrolls gracefully only when popup-container hits 400px maximum */
+    #content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    /* Custom Chrome Scrollbar style mapping */
+    #content::-webkit-scrollbar {
+      width: 8px;
+    }
+    #content::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    #content::-webkit-scrollbar-thumb {
+      background: var(--scrollbar-thumb); /* Linked dynamically to theme engine */
+      border-radius: 4px;
+    }
+    #content::-webkit-scrollbar-thumb:hover {
+      background: var(--scrollbar-thumb-hover); /* Linked dynamically to theme engine */
     }
 
     .state {
       padding: 40px 20px;
       text-align: center;
-      color: var(--text-muted, #888888);
+      color: var(--text-muted);
     }
     .state-icon { font-size: 26px; margin-bottom: 10px; }
     .state p    { font-size: 12px; line-height: 1.6; }
 
-    .group { border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.06)); }
+    .group { border-bottom: 1px solid var(--border-color); }
     .group-header {
       display: flex;
       align-items: center;
@@ -70,18 +149,18 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.07em;
-      color: var(--text-muted, #888888);
+      color: var(--text-muted);
     }
     .btn-del-domain {
       all: unset;
       cursor: pointer;
       font-size: 10.5px;
-      color: var(--text-muted, #888888);
+      color: var(--text-muted);
       padding: 2px 7px;
       border-radius: 4px;
       transition: color 0.12s, background 0.12s;
     }
-    .btn-del-domain:hover { color: #e05555; background: var(--bg-accent, #2a2a2a); }
+    .btn-del-domain:hover { color: #ea4335; background: var(--bg-accent); }
 
     .account {
       display: flex;
@@ -90,7 +169,7 @@
       padding: 7px 16px 7px 22px;
       transition: background 0.1s;
     }
-    .account:hover { background: var(--bg-accent, #2a2a2a); }
+    .account:hover { background: var(--bg-accent); }
     .account-email {
       flex: 1;
       min-width: 0;
@@ -98,56 +177,56 @@
       overflow: hidden;
       text-overflow: ellipsis;
       font-size: 12.5px;
-      color: var(--text-main, #efefef);
+      color: var(--text-main);
     }
     .account-time {
       font-size: 10px;
-      color: var(--text-muted, #888888);
+      color: var(--text-muted);
       flex-shrink: 0;
     }
     .btn-del-account {
       all: unset;
       cursor: pointer;
       font-size: 13px;
-      color: var(--text-muted, #888888);
+      color: var(--text-muted);
       padding: 2px 5px;
       border-radius: 4px;
       flex-shrink: 0;
       transition: color 0.12s;
     }
-    .btn-del-account:hover { color: #e05555; }
+    .btn-del-account:hover { color: #ea4335; }
 
     @keyframes spin { to { transform: rotate(360deg); } }
     .spinner {
       width: 16px; height: 16px;
-      border: 2px solid var(--bg-accent, #2a2a2a);
-      border-top-color: var(--brand-primary, #6366f1);
+      border: 2px solid var(--bg-accent);
+      border-top-color: var(--brand-primary);
       border-radius: 50%;
       animation: spin 0.6s linear infinite;
       margin: 40px auto;
     }
-
-    .account.removing, .group.removing {
-      transition: opacity 0.2s, max-height 0.25s;
-      overflow: hidden;
-      opacity: 0;
-      max-height: 0;
-      padding: 0;
-    }
   </style>
 </head>
 <body>
-  <div class="header">
-    <div class="header-left">
-      <span class="header-icon">🔑</span>
-      <div>
-        <div class="header-title">NotThatOne</div>
-        <div class="header-sub">Saved account mappings</div>
+  <div class="popup-container">
+    <div class="header">
+      <div class="header-left">
+        <span class="header-icon">🔑</span>
+        <div>
+          <div class="header-title">NotThatOne</div>
+          <div class="header-sub">Saved account mappings</div>
+        </div>
       </div>
+      <button id="nto-theme-toggle-btn" title="Toggle Theme">🌙</button>
     </div>
-    <button id="nto-theme-toggle-btn" title="Toggle Theme">🌙</button>
+
+    <div class="search-container">
+      <input type="text" id="nto-search-bar" placeholder="Search domains..." spellcheck="false" autocomplete="off" />
+    </div>
+
+    <div id="content"><div class="spinner"></div></div>
   </div>
-  <div id="content"><div class="spinner"></div></div>
+
   <script src="../modules/themes.js"></script>
   <script src="dashboard.js"></script>
 </body>

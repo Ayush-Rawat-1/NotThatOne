@@ -5,6 +5,7 @@
 
 const content = document.getElementById('content');
 const themeToggleBtn = document.getElementById('nto-theme-toggle-btn');
+const searchBar = document.getElementById('nto-search-bar'); // Search input reference
 
 function timeAgo(ts) {
     const d = Date.now() - ts; 
@@ -73,7 +74,9 @@ function renderMappings(mappings) {
         content.appendChild(group); 
     }
 
-    wireDeleteHandlers(); 
+    wireDeleteHandlers();
+    // Run filtering immediately after rendering to preserve filter persistence across state cleans
+    filterDomains(searchBar.value); 
 }
 
 function wireDeleteHandlers() {
@@ -135,6 +138,26 @@ function animateRemove(el, afterRemove) {
         afterRemove?.(); 
     }, { once: true }); 
 }
+
+// Domain query search mechanism
+function filterDomains(query) {
+    const cleanQuery = query.toLowerCase().trim();
+    const groups = content.querySelectorAll('.group');
+    
+    groups.forEach(group => {
+        const domainName = group.dataset.domain || '';
+        if (domainName.toLowerCase().includes(cleanQuery)) {
+            group.style.display = 'block';
+        } else {
+            group.style.display = 'none';
+        }
+    });
+}
+
+// Listen for query typing events
+searchBar.addEventListener('input', (e) => {
+    filterDomains(e.target.value);
+});
 
 async function loadDashboard() {
     content.innerHTML = '<div class="spinner"></div>'; 
